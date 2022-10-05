@@ -1,9 +1,7 @@
 var express = require('express');
 var haversine = require('./haversine.js')
 var router = express.Router();
-
-//TODO  -add match to check for number
-//      -redo dist func
+var auth = require('./api/auth')
 
 var merchants = [
     {latitude: 53.392284, longitude: -6.192228, merchantId: 1, merchantName: "Leisureplex"},
@@ -32,7 +30,7 @@ router.get('/:id([0-9]{1,})', function(req, res){
     }
 });
 
-router.get('/:latitude/:longitude/', function(req, res){
+router.get('/:latitude/:longitude/', [auth], function(req, res){
 
     input = {latitude: req.params.latitude, longitude: req.params.longitude};
 
@@ -48,7 +46,7 @@ router.get('/:latitude/:longitude/', function(req, res){
     res.json(sortedMerchants);
 });
 
-router.get('/:latitude/:longitude/:id', function(req, res){
+router.get('/:latitude/:longitude/:id', [auth], function(req, res){
     var currMerchant = merchants.filter(function(merchants){
         if(merchants.merchantId == req.params.id){
             return true;
@@ -63,7 +61,7 @@ router.get('/:latitude/:longitude/:id', function(req, res){
     res.json({message: "Distance from (" +  req.params.latitude + ", " + req.params.longitude + ") to merchant " + currMerchant[0].merchantName + "(" + currMerchant[0].latitude + ", " + currMerchant[0].longitude + ")" + " is " + distance});
 });
 
-router.post('/', function(req, res){
+router.post('/', [auth], function(req, res){
     //Check if all fields are provided and are valid:
     if(!req.body.merchantName ||
         !req.body.latitude.toString() ||
@@ -120,10 +118,10 @@ router.post('/', function(req, res){
         }
     }
 
-router.put('/:id', updateMerchant);
-router.patch('/:id', updateMerchant);
+router.put('/:id([0-9]{1,})', [auth], updateMerchant);
+router.patch('/:id([0-9]{1,})', [auth], updateMerchant);
 
-router.delete('/:id', function(req, res){
+router.delete('/:id([0-9]{1,})', [auth], function(req, res){
     var removeIndex = merchants.map(function(merchants){
         return merchants.merchantId;
     }).indexOf(parseInt(req.params.id)); 

@@ -13,8 +13,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //Require the Router we defined in movies.js
 var merchants = require('./merchants.js');
-
+var auth = require('./auth.js');
 //Use the Router on the sub route /movies
 app.use('/merchants', merchants);
+app.use('/auth', auth);
 
 app.listen(3000, () => console.log('Listening on port 3000'));
